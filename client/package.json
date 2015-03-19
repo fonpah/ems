@@ -1,0 +1,25 @@
+{
+  "version": "0.0.1",
+  "private": false,
+  "name": "ems-frontend",
+  "description": "Prottotype to demonstrate the power of angular js and symfony 2",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fonpah/ems.git"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "grunt-closurecompiler": "*",
+    "grunt-contrib-clean": "*",
+    "grunt-contrib-concat": "*",
+    "grunt-contrib-copy": "*",
+    "grunt-contrib-jshint": "*",
+    "grunt-contrib-watch": "*",
+    "grunt-contrib-uglify":"*"
+  },
+  "peerDependencies": {
+    "bower": "*",
+    "grunt-cli": "*",
+    "grunt": "*"
+  }
+}

@@ -43,3 +43,4 @@ api/app/cache/
 api/app/logs/
 api/app/vendor/
 api/web/bundles/
+client/src/vendor/
