@@ -8,6 +8,15 @@ module.exports = function (grunt) {
       dist: {
         // the files to concatenate
         src: [
+
+
+
+          'src/app/common/resources/module.js',
+          'src/app/common/resources/company_profile.js',
+
+          'src/app/dashboard/dashboard.js',
+          'src/app/dashboard/dashboard.ctrl.js',
+
           'src/app/app.js',
           'src/app/app.properties.js',
           'src/app/app.ctrl.js'

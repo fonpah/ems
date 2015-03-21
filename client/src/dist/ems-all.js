@@ -1,3 +1,70 @@
+/**
+ * Created by fonpah on 20.03.2015.
+ */
+(function () {
+    "use strict";
+
+    angular.module('ems.common.resources', [
+        'ngResource',
+        'ems.appProperties'
+    ]);
+})();
+/**
+ * Created by fonpah on 20.03.2015.
+ */
+(function(){
+    "use strict";
+    angular.module('ems.common.resources')
+        .factory('CompanyProfileResourceFactory', CompanyProfileResourceFactory);
+
+    CompanyProfileResourceFactory.$inject = ['$resource', 'RESOURCE_BASE_URL'];
+    function CompanyProfileResourceFactory ($resource, RESOURCE_BASE_URL){
+        return $resource(RESOURCE_BASE_URL,{},{
+            getCompanyProfile: {method:"GET",params:{verb:"company-profile.json"}, isArray:false}
+        });
+    }
+})();
+/**
+ * Created by fonpah on 20.03.2015.
+ */
+(function () {
+    "use strict";
+    angular.module('ems.dashboard', [
+        'ui.bootstrap',
+        'ui.router'
+    ])
+        .config([
+            '$stateProvider',
+            '$urlRouterProvider',
+            function ($stateProvider, $urlRouterProvider) {
+
+                $stateProvider
+                    .state('dashboard', {
+                        name: 'dashboard',
+                        url: '/',
+                        resolve: {
+                            companyProfile: ['CompanyProfileResourceFactory', function (CompanyProfileResourceFactory) {
+                                return CompanyProfileResourceFactory.getCompanyProfile().$promise;
+                            }]
+                        },
+                        controller: 'DashboardController'
+                    });
+            }
+        ])
+
+})();
+/**
+ * Created by fonpah on 20.03.2015.
+ */
+(function(){
+    "use strict";
+    angular.module('ems.dashboard')
+        .controller('DashboardController', dashboardController);
+    dashboardController.$inject = ['$scope', 'companyProfile'];
+    function dashboardController($scope, companyProfile){
+        console.log(companyProfile);
+    }
+})();
 (function () {
     'use strict';
 
@@ -7,6 +74,8 @@
             'ui.router',
             'ngStorage',
             'ems.appProperties',
+            'ems.common.resources',
+            'ems.dashboard'
         ])
 
         .config(['$logProvider', '$urlRouterProvider', function ($logProvider, $urlRouterProvider) {
@@ -33,11 +102,11 @@
 
   /**
    * @ngdoc service
-   * @name pqTimes.appProperties.RESOURCE_BASE_URL
+   * @name ems.appProperties.RESOURCE_BASE_URL
    * @description A module constant which holds base url to communicate with rest api.
    * **/
 
-    .constant('RESOURCE_BASE_URL', '/ems.api.dev/:verb/:id/:specificVerb')
+    .constant('RESOURCE_BASE_URL', '/api/:verb/:id/:specificVerb')
 
   /**
    * @ngdoc service
@@ -90,7 +159,7 @@
     $scope.toggleSidebar = toggleSidebar;
     $scope.logout = logout;
 
-    $rootScope.$on('$stateChangeSuccess', onStateChangedSuccesful);
+    $rootScope.$on('$stateChangeSuccess', onStateChangedSuccessful);
 
     function toggleSidebar(){
       $scope.appData.toggle = !$scope.appData.toggle;
@@ -100,9 +169,9 @@
       alert("logout");
     }
 
-    function onStateChangedSuccesful(event, toState, toParams, fromState, fromParams){
-      $scope.appData.state = toState.name;
-      $scope.title = toState.data.title;
+    function onStateChangedSuccessful(event, toState, toParams, fromState, fromParams){
+      //$scope.appData.state = toState.name;
+      //$scope.title = toState.data.title;
     }
   }
 })();

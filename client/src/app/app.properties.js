@@ -15,11 +15,11 @@
 
   /**
    * @ngdoc service
-   * @name pqTimes.appProperties.RESOURCE_BASE_URL
+   * @name ems.appProperties.RESOURCE_BASE_URL
    * @description A module constant which holds base url to communicate with rest api.
    * **/
 
-    .constant('RESOURCE_BASE_URL', '/ems.api.dev/:verb/:id/:specificVerb')
+    .constant('RESOURCE_BASE_URL', '/api/:verb/:id/:specificVerb')
 
   /**
    * @ngdoc service

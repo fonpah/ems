@@ -7,6 +7,8 @@
             'ui.router',
             'ngStorage',
             'ems.appProperties',
+            'ems.common.resources',
+            'ems.dashboard'
         ])
 
         .config(['$logProvider', '$urlRouterProvider', function ($logProvider, $urlRouterProvider) {

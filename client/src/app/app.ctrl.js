@@ -40,7 +40,7 @@
     $scope.toggleSidebar = toggleSidebar;
     $scope.logout = logout;
 
-    $rootScope.$on('$stateChangeSuccess', onStateChangedSuccesful);
+    $rootScope.$on('$stateChangeSuccess', onStateChangedSuccessful);
 
     function toggleSidebar(){
       $scope.appData.toggle = !$scope.appData.toggle;
@@ -50,9 +50,9 @@
       alert("logout");
     }
 
-    function onStateChangedSuccesful(event, toState, toParams, fromState, fromParams){
-      $scope.appData.state = toState.name;
-      $scope.title = toState.data.title;
+    function onStateChangedSuccessful(event, toState, toParams, fromState, fromParams){
+      //$scope.appData.state = toState.name;
+      //$scope.title = toState.data.title;
     }
   }
 })();

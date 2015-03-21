@@ -1,0 +1,4 @@
+devster_app_company_profile_view:
+    path:     /company-profile
+    defaults: { _controller: DevsterAppBundle:CompanyProfile:view }
+    methods: [GET]

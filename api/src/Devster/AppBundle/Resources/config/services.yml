@@ -1,0 +1,14 @@
+parameters:
+    devster_app.company_profile.service.class: Devster\AppBundle\Service\CompanyProfileService
+    devster_app.company_profile.class: Devster\AppBundle\Entity\CompanyProfile
+
+#    devster_app.example.class: Devster\AppBundle\Example
+
+services:
+    devster_app.company_profile.service:
+          class: %devster_app.company_profile.service.class%
+          arguments: [@doctrine.orm.entity_manager, %devster_app.company_profile.class%]
+
+    #    devster_app.example:
+    #        class: %devster_app.example.class%
+    #        arguments: [@service_id, "plain_value", %parameter%]

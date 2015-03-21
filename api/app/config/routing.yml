@@ -1,3 +1,18 @@
+devster_project:
+    resource: "@DevsterProjectBundle/Resources/config/routing.yml"
+    prefix:   /api
+    type: rest
+
+devster_employee:
+    resource: "@DevsterEmployeeBundle/Resources/config/routing.yml"
+    prefix:   /api
+    type: rest
+
+devster_app:
+    resource: "@DevsterAppBundle/Resources/config/routing.yml"
+    prefix:   /api
+    type: rest
+
 NelmioApiDocBundle:
   resource: "@NelmioApiDocBundle/Resources/config/routing.yml"
   prefix:   /api/doc

@@ -105,7 +105,7 @@ apache:
             servername: ems.dev
             serveraliases:
                 - www.ems.dev
-            docroot: /var/www/client/src
+            docroot: /var/www/api/web/
             port: '80'
             setenv:
                 - 'APP_ENV dev'
@@ -113,7 +113,7 @@ apache:
             directories:
                 2gzjzoetkzlu:
                     provider: directory
-                    path: /var/www/client/src
+                    path: /var/www/api/web/
                     options:
                         - Indexes
                         - FollowSymlinks
@@ -123,38 +123,21 @@ apache:
                     require:
                         - all
                         - granted
-                    custom_fragment: ''
+                2gzjzoetkzli:
+                        provider: directory
+                        path: /var/www/client/src/
+                        options:
+                            - Indexes
+                            - FollowSymlinks
+                            - MultiViews
+                        allow_override:
+                            - All
+                        require:
+                            - all
+                            - granted
+                        custom_fragment: ''
             engine: php
-            custom_fragment: ''
-            ssl_cert: ''
-            ssl_key: ''
-            ssl_chain: ''
-            ssl_certs_dir: ''
-        2f8igka3ipe1:
-            servername: api.ems.dev
-            serveraliases:
-                - www.api.ems.dev
-            docroot: /var/www/api/web
-            port: '80'
-            setenv:
-                - 'APP_ENV dev'
-                - 'APP_DEBUG true'
-            directories:
-                2gzjzoetkzlw:
-                    provider: directory
-                    path: /var/www/api/web
-                    options:
-                        - Indexes
-                        - FollowSymlinks
-                        - MultiViews
-                    allow_override:
-                        - All
-                    require:
-                        - all
-                        - granted
-                    custom_fragment: ''
-            engine: php
-            custom_fragment: ''
+            custom_fragment: 'Alias /client/dev /var/www/client/src/'
             ssl_cert: ''
             ssl_key: ''
             ssl_chain: ''
@@ -226,7 +209,7 @@ php:
         error_reporting: '-1'
         session.save_path: /var/lib/php/session
         date.timezone: UTC
-    mod_php: 0
+    mod_php: 1
 hhvm:
     install: '0'
     nightly: 0

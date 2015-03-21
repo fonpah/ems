@@ -1,0 +1,8 @@
+parameters:
+    devster_employee.employee.service.class: Devster\EmployeeBundle\Service\EmployeeService
+    devster_employee.employee.entity.class: Devster\EmployeeBundle\Entity\Employee
+
+services:
+    devster_employee.employee.service:
+        class: %devster_employee.employee.service.class%
+        arguments: [@doctrine.orm.entity_manager, "%devster_employee.employee.entity.class%"]
