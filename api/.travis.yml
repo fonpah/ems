@@ -1,19 +1,15 @@
+# .travis.yml
 language: php
 
 php:
-  - 5.3
-  - 5.4
-  - 5.5
-  - 5.6
-  - hhvm
+    - 5.5
 
-matrix:
-    allow_failures:
-        - php: 5.6
-        - php: hhvm
+before_script:
+  - curl -s http://getcomposer.org/installer | php
+  - COMPOSER_ROOT_VERSION=dev-master php composer.phar --dev install
+  - build/travis.sh
 
-before_script: composer install --prefer-source
+script: phpunit -c build/
 
-after_failure: "cat /home/travis/build/gimler/symfony-rest-edition/app/logs/test.log"
-
-script: phpunit -c app
+notifications:
+  email: "santiago.diaz@me.com"

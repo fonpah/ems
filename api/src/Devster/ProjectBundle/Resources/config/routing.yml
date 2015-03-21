@@ -1,3 +1,0 @@
-devster_project_homepage:
-    path:     /hello/{name}
-    defaults: { _controller: DevsterProjectBundle:Default:index }

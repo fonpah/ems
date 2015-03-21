@@ -1,18 +1,16 @@
-devster_project:
-    resource: "@DevsterProjectBundle/Resources/config/routing.yml"
+restful_services:
+    resource: "@AppBundle/Resources/config/routing.yml"
+    type:     rest
     prefix:   /api
-    type: rest
 
-devster_employee:
-    resource: "@DevsterEmployeeBundle/Resources/config/routing.yml"
-    prefix:   /api
-    type: rest
+nelmio_apidoc:
+    resource: "@NelmioApiDocBundle/Resources/config/routing.yml"
+    prefix:   /
 
-devster_app:
-    resource: "@DevsterAppBundle/Resources/config/routing.yml"
-    prefix:   /api
-    type: rest
+fos_user_security:
+    resource: "@FOSUserBundle/Resources/config/routing/security.xml"
+    prefix: /console
 
-NelmioApiDocBundle:
-  resource: "@NelmioApiDocBundle/Resources/config/routing.yml"
-  prefix:   /api/doc
+fos_user_resetting:
+    resource: "@FOSUserBundle/Resources/config/routing/resetting.xml"
+    prefix: /console/resetting
