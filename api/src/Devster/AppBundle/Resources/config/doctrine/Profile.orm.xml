@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping http://doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+  <entity name="Devster\AppBundle\Entity\Profile" table="profile">
+    <indexes>
+      <index name="fk_profile_employee_idx" columns="employee_id"/>
+    </indexes>
+    <id name="id" type="integer" column="id">
+      <generator strategy="IDENTITY"/>
+    </id>
+    <field name="firstName" type="string" column="first_name" length="45" nullable="false"/>
+    <field name="lastName" type="string" column="last_name" length="45" nullable="false"/>
+    <field name="birthdate" type="date" column="birthdate" nullable="false"/>
+    <field name="tel" type="string" column="tel" length="45" nullable="true"/>
+    <field name="gender" type="string" column="gender" length="1" nullable="true"/>
+    <field name="createdAt" type="datetime" column="created_at" nullable="true"/>
+    <field name="updatedAt" type="datetime" column="updated_at" nullable="true"/>
+    <many-to-one field="employee" target-entity="Employee">
+      <join-columns>
+        <join-column name="employee_id" referenced-column-name="id"/>
+      </join-columns>
+    </many-to-one>
+  </entity>
+</doctrine-mapping>

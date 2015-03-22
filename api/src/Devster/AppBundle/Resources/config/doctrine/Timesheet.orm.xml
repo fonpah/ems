@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping http://doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+  <entity name="Devster\AppBundle\Entity\Timesheet" table="timesheet">
+    <indexes>
+      <index name="fk_timesheet_employee1_idx" columns="employee_id"/>
+      <index name="fk_timesheet_project1_idx" columns="project_id"/>
+    </indexes>
+    <id name="id" type="integer" column="id">
+      <generator strategy="IDENTITY"/>
+    </id>
+    <field name="startDate" type="datetime" column="start_date" nullable="false"/>
+    <field name="endDate" type="datetime" column="end_date" nullable="false"/>
+    <field name="break" type="integer" column="break" nullable="false"/>
+    <field name="text" type="text" column="text" nullable="true"/>
+    <field name="createdAt" type="datetime" column="created_at" nullable="true"/>
+    <field name="updatedAt" type="datetime" column="updated_at" nullable="true"/>
+    <many-to-one field="project" target-entity="Project">
+      <join-columns>
+        <join-column name="project_id" referenced-column-name="id"/>
+      </join-columns>
+    </many-to-one>
+    <many-to-one field="employee" target-entity="Employee">
+      <join-columns>
+        <join-column name="employee_id" referenced-column-name="id"/>
+      </join-columns>
+    </many-to-one>
+  </entity>
+</doctrine-mapping>

@@ -1,0 +1,243 @@
+-- MySQL Workbench Forward Engineering
+
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
+
+-- -----------------------------------------------------
+-- Schema ems_dev
+-- -----------------------------------------------------
+
+-- -----------------------------------------------------
+-- Schema ems_dev
+-- -----------------------------------------------------
+CREATE SCHEMA IF NOT EXISTS `ems_dev` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci ;
+USE `ems_dev` ;
+
+-- -----------------------------------------------------
+-- Table `ems_dev`.`employee`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `ems_dev`.`employee` ;
+
+CREATE TABLE IF NOT EXISTS `ems_dev`.`employee` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `username` VARCHAR(45) NOT NULL,
+  `email` VARCHAR(255) NOT NULL,
+  `password` VARCHAR(255) NOT NULL,
+  `status` INT NOT NULL DEFAULT 0,
+  `is_deleted` TINYINT(1) NULL DEFAULT 0,
+  `updated_at` DATETIME NULL,
+  `created_at` DATETIME NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `email_UNIQUE` (`email` ASC))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `ems_dev`.`profile`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `ems_dev`.`profile` ;
+
+CREATE TABLE IF NOT EXISTS `ems_dev`.`profile` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `first_name` VARCHAR(45) NOT NULL,
+  `last_name` VARCHAR(45) NOT NULL,
+  `birthdate` DATE NOT NULL,
+  `tel` VARCHAR(45) NULL,
+  `gender` CHAR(1) NULL DEFAULT 'n',
+  `created_at` DATETIME NULL,
+  `updated_at` DATETIME NULL,
+  `employee_id` INT NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_profile_employee_idx` (`employee_id` ASC),
+  CONSTRAINT `fk_profile_employee`
+    FOREIGN KEY (`employee_id`)
+    REFERENCES `ems_dev`.`employee` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `ems_dev`.`address`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `ems_dev`.`address` ;
+
+CREATE TABLE IF NOT EXISTS `ems_dev`.`address` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `street` VARCHAR(255) NOT NULL,
+  `zip` VARCHAR(10) NOT NULL,
+  `city` VARCHAR(45) NOT NULL,
+  `country` VARCHAR(45) NOT NULL,
+  `created_at` DATETIME NULL,
+  `updated_at` DATETIME NULL,
+  `employee_id` INT NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_address_employee1_idx` (`employee_id` ASC),
+  CONSTRAINT `fk_address_employee1`
+    FOREIGN KEY (`employee_id`)
+    REFERENCES `ems_dev`.`employee` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `ems_dev`.`project`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `ems_dev`.`project` ;
+
+CREATE TABLE IF NOT EXISTS `ems_dev`.`project` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(100) NOT NULL,
+  `start_date` DATETIME NOT NULL,
+  `end_date` DATETIME NULL,
+  `text` TEXT NULL,
+  `created_at` DATETIME NULL,
+  `updated_at` DATETIME NULL,
+  PRIMARY KEY (`id`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `ems_dev`.`contract`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `ems_dev`.`contract` ;
+
+CREATE TABLE IF NOT EXISTS `ems_dev`.`contract` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `yearly_pre_tax_salary` DECIMAL(10,2) NOT NULL,
+  `yearly_holidays` INT NOT NULL,
+  `daily_work_hours` INT NOT NULL DEFAULT 8,
+  `other_detail` TEXT NULL,
+  `created_at` DATETIME NULL,
+  `updated_at` DATETIME NULL,
+  `employee_id` INT NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_contract_employee1_idx` (`employee_id` ASC),
+  CONSTRAINT `fk_contract_employee1`
+    FOREIGN KEY (`employee_id`)
+    REFERENCES `ems_dev`.`employee` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `ems_dev`.`timesheet`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `ems_dev`.`timesheet` ;
+
+CREATE TABLE IF NOT EXISTS `ems_dev`.`timesheet` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `start_date` DATETIME NOT NULL,
+  `end_date` DATETIME NOT NULL,
+  `break` INT NOT NULL,
+  `text` TEXT NULL,
+  `created_at` DATETIME NULL,
+  `updated_at` DATETIME NULL,
+  `employee_id` INT NOT NULL,
+  `project_id` INT NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_timesheet_employee1_idx` (`employee_id` ASC),
+  INDEX `fk_timesheet_project1_idx` (`project_id` ASC),
+  CONSTRAINT `fk_timesheet_employee1`
+    FOREIGN KEY (`employee_id`)
+    REFERENCES `ems_dev`.`employee` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_timesheet_project1`
+    FOREIGN KEY (`project_id`)
+    REFERENCES `ems_dev`.`project` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `ems_dev`.`leave_type`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `ems_dev`.`leave_type` ;
+
+CREATE TABLE IF NOT EXISTS `ems_dev`.`leave_type` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(45) NOT NULL,
+  `text` TEXT NULL,
+  `created_at` DATETIME NULL,
+  `updated_at` DATETIME NULL,
+  PRIMARY KEY (`id`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `ems_dev`.`leave_taken`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `ems_dev`.`leave_taken` ;
+
+CREATE TABLE IF NOT EXISTS `ems_dev`.`leave_taken` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `start_date` DATE NOT NULL,
+  `end_date` DATE NOT NULL,
+  `days` INT NOT NULL,
+  `status` CHAR(1) NULL DEFAULT 0,
+  `created_at` DATETIME NULL,
+  `updated_at` DATETIME NULL,
+  `employee_id` INT NOT NULL,
+  `leave_type_id` INT NOT NULL,
+  `approved_by` INT NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_leave_taken_employee1_idx` (`employee_id` ASC),
+  INDEX `fk_leave_taken_leave_type1_idx` (`leave_type_id` ASC),
+  INDEX `fk_leave_taken_employee2_idx` (`approved_by` ASC),
+  CONSTRAINT `fk_leave_taken_employee1`
+    FOREIGN KEY (`employee_id`)
+    REFERENCES `ems_dev`.`employee` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_leave_taken_leave_type1`
+    FOREIGN KEY (`leave_type_id`)
+    REFERENCES `ems_dev`.`leave_type` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_leave_taken_employee2`
+    FOREIGN KEY (`approved_by`)
+    REFERENCES `ems_dev`.`employee` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `ems_dev`.`employee_on_project`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `ems_dev`.`employee_on_project` ;
+
+CREATE TABLE IF NOT EXISTS `ems_dev`.`employee_on_project` (
+  `project_id` INT NOT NULL,
+  `employee_id` INT NOT NULL,
+  `assigned_by` INT NOT NULL,
+  INDEX `fk_project_has_employee_employee1_idx` (`employee_id` ASC),
+  INDEX `fk_project_has_employee_project1_idx` (`project_id` ASC),
+  INDEX `fk_employee_on_project_employee1_idx` (`assigned_by` ASC),
+  PRIMARY KEY (`project_id`, `employee_id`),
+  CONSTRAINT `fk_project_has_employee_project1`
+    FOREIGN KEY (`project_id`)
+    REFERENCES `ems_dev`.`project` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_project_has_employee_employee1`
+    FOREIGN KEY (`employee_id`)
+    REFERENCES `ems_dev`.`employee` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_employee_on_project_employee1`
+    FOREIGN KEY (`assigned_by`)
+    REFERENCES `ems_dev`.`employee` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;

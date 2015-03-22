@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping http://doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+  <entity name="Devster\AppBundle\Entity\LeaveTaken" table="leave_taken">
+    <indexes>
+      <index name="fk_leave_taken_employee1_idx" columns="employee_id"/>
+      <index name="fk_leave_taken_leave_type1_idx" columns="leave_type_id"/>
+      <index name="fk_leave_taken_employee2_idx" columns="approved_by"/>
+    </indexes>
+    <id name="id" type="integer" column="id">
+      <generator strategy="IDENTITY"/>
+    </id>
+    <field name="startDate" type="date" column="start_date" nullable="false"/>
+    <field name="endDate" type="date" column="end_date" nullable="false"/>
+    <field name="days" type="integer" column="days" nullable="false"/>
+    <field name="status" type="string" column="status" length="1" nullable="true"/>
+    <field name="createdAt" type="datetime" column="created_at" nullable="true"/>
+    <field name="updatedAt" type="datetime" column="updated_at" nullable="true"/>
+    <many-to-one field="approvedBy" target-entity="Employee">
+      <join-columns>
+        <join-column name="approved_by" referenced-column-name="id"/>
+      </join-columns>
+    </many-to-one>
+    <many-to-one field="leaveType" target-entity="LeaveType">
+      <join-columns>
+        <join-column name="leave_type_id" referenced-column-name="id"/>
+      </join-columns>
+    </many-to-one>
+    <many-to-one field="employee" target-entity="Employee">
+      <join-columns>
+        <join-column name="employee_id" referenced-column-name="id"/>
+      </join-columns>
+    </many-to-one>
+  </entity>
+</doctrine-mapping>

@@ -264,7 +264,8 @@ mysql:
     settings:
         override_options: {  }
         root_password: root
-    adminer: 0
+    adminer: 1
+    phpmyadmin: 1
     databases:
         wxha8NUe1WfW:
             grant:

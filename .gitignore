@@ -39,8 +39,8 @@ com_crashlytics_export_strings.xml
 *~
 tmp/
 client/node_modules/
-api/var/cache/
-api/var/logs/
+api/app/cache/
+api/app/logs/
 api/vendor/
 api/web/bundles/
 client/src/vendor/
