@@ -2,15 +2,21 @@
 
 namespace Devster\AppBundle\Controller;
 
+use Devster\AppBundle\Entity\Employee;
+use Devster\AppBundle\Exception\InvalidFormException;
+use Devster\AppBundle\Form\Type\EmployeeType;
 use Devster\AppBundle\Service\EmployeeService;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Request\ParamFetcherInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\HttpFoundation\Request;
 use FOS\RestBundle\View\View;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use FOS\RestBundle\Util\Codes;
 use FOS\RestBundle\Controller\Annotations;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 
 /**
  * Class EmployeeController
@@ -27,17 +33,24 @@ class EmployeeController extends FOSRestController
      *     200 = "Returned when successful"
      *   }
      * )
+     * @Annotations\QueryParam(name="offset", requirements="\d+", nullable=true, description="Offset from which to start listing pages.")
+     * @Annotations\QueryParam(name="limit", requirements="\d+", default="5", description="How many pages to return.")
      *
-     * @Annotations\View()
+     * @Annotations\View
+     *    templateVar = "employees"
+     * )
      *
      * @param Request               $request      the request object
      * @param ParamFetcherInterface $paramFetcher param fetcher service
      *
      * @return array
      */
-    public function indexAction(Request $request, ParamFetcherInterface $paramFetcherInterface)
+    public function getEmployeesAction(Request $request, ParamFetcherInterface $paramFetcher)
     {
-
+        $offset = $paramFetcher->get('offset');
+        $offset = null == $offset ? 0 : $offset;
+        $limit = $paramFetcher->get('limit');
+        return $this->getService()->all($offset, $limit);
     }
     /**
      * Get a single Employee.
@@ -55,20 +68,20 @@ class EmployeeController extends FOSRestController
      * @param Request $request the request object
      * @param int     $id      the employee id
      *
-     * @return array
+     * @return Employee
      *
      * @throws NotFoundHttpException when note not exist
      */
-    public function viewAction(Request $request, $id)
+    public function getEmployeeAction(Request $request, $id)
     {
-
+        return $this->getOr404($id);
     }
     /**
      * Creates a new employee from the submitted data.
      *
      * @ApiDoc(
      *   resource = true,
-     *   input = "",
+     *   input = "Devster\AppBundle\Form\Type\EmployeeType",
      *   statusCodes = {
      *     200 = "Returned when successful",
      *     400 = "Returned when the form has errors"
@@ -76,24 +89,34 @@ class EmployeeController extends FOSRestController
      * )
      *
      * @Annotations\View(
-     *   template = "",
+     *   template = "DevsterAppBundle:Employee:newEmployee.html.twig",
+     *   templateVar= "form",
      *   statusCode = Codes::HTTP_BAD_REQUEST
      * )
      *
      * @param Request $request the request object
      *
-     * @return null
+     * @return FormTypeInterface|View
      */
-    public function postAction(Request $request)
+    public function postEmployeeAction(Request $request)
     {
-
+        try{
+            $newEmployee = $this->getService()->post($request->request->all());
+            $routeOpts = [
+              'id' => $newEmployee->getId(),
+                '_format'=> $request->get('_format')
+            ];
+            return $this->routeRedirectView('api_v1_get_employee', $routeOpts, Codes::HTTP_CREATED);
+        }catch (InvalidFormException $e){
+            return $e->getForm();
+        }
     }
     /**
-     * Update existing employee from the submitted data or create a new note at a specific location.
+     * Update existing employee from the submitted data .
      *
      * @ApiDoc(
      *   resource = true,
-     *   input = "",
+     *   input = "Devster\AppBundle\Form\Type\EmployeeType",
      *   statusCodes = {
      *     201 = "Returned when a new resource is created",
      *     204 = "Returned when successful",
@@ -102,7 +125,7 @@ class EmployeeController extends FOSRestController
      * )
      *
      * @Annotations\View(
-     *   template="",
+     *   template="DevsterAppBundle:Employee:editEmployee.html.twig",
      *   templateVar="form"
      * )
      *
@@ -113,32 +136,60 @@ class EmployeeController extends FOSRestController
      *
      * @throws NotFoundHttpException when note not exist
      */
-    public function putAction(Request $request, $id)
+    public function putEmployeeAction(Request $request, $id)
     {
+        try{
+            $employee = $this->getService()->put($this->getOr404($id), $request->request->all());
 
+            $routeOpts = [
+                'id' => $employee->getId(),
+                '_format' => $request->get('_format')
+            ];
+            return $this->routeRedirectView('api_1_get_employee', $routeOpts, Codes::HTTP_NO_CONTENT);
+        }
+        catch(InvalidFormException $e){
+            return $e->getForm();
+        }
     }
     /**
      * Presents the form to use to update an existing employee.
      *
      * @ApiDoc(
      *   resource = true,
+     *   input = "",
      *   statusCodes={
      *     200 = "Returned when successful",
-     *     404 = "Returned when the note is not found"
+     *     404 = "Returned when the employee is not found"
      *   }
      * )
      *
-     * @Annotations\View()
+     * @Annotations\View(
+     *    template="DevsterAppBundle:Employee:editEmployee.html.twig",
+     *    templateVar = "form"
+     *
+     * )
      *
      * @param Request $request the request object
      * @param int     $id      the employee id
      *
-     * @return FormTypeInterface
+     * @return FormTypeInterface | View
      *
      * @throws NotFoundHttpException when note not exist
      */
-    public function editAction()
+    public function patchEmployeeAction(Request $request, $id)
     {
+        try{
+            $employee = $this->getService()->patch($this->getOr404($id), $request->request->all());
+
+            $routeOpts = [
+                'id' => $employee->getId(),
+                '_format' => $request->get('_format')
+            ];
+
+            return $this->routeRedirectView('api_1_get_employee', $routeOpts, Codes::HTTP_NO_CONTENT);
+        }catch (InvalidFormException $e){
+            return $e->getForm();
+        }
 
     }
     /**
@@ -151,13 +202,18 @@ class EmployeeController extends FOSRestController
      *   }
      * )
      *
+     * @Annotations\View(
+     * statusCode = 204
+     *
+     * )
      * @param Request $request the request object
      * @param int     $id      the employee id
-     *
-     * @return null
+     * @throws NotFoundHttpException when note not exist
+     * @return bool
      */
-    public function deleteAction(Request $request, $id)
+    public function deleteEmployeeAction(Request $request, $id)
     {
+       return $this->getService()->delete($this->getOr404($id));
 
     }
 
@@ -171,20 +227,31 @@ class EmployeeController extends FOSRestController
      *   }
      * )
      *
-     * @Annotations\View()
+     * @Annotations\View(
+     *  template="DevsterAppBundle:Employee:createEmployee.html.twig",
+     *  templateVar = "form"
+     * )
      *
-     * @return null
+     * @return FormTypeInterface
      */
-    public function createAction()
+    public function newEmployeeAction()
     {
-
+        return $this->createForm(new EmployeeType());
     }
 
     /**
      * @return EmployeeService
      */
-    private function getService()
+    protected function getService()
     {
         return $this->container->get('devster_employee.employee.service');
+    }
+
+    protected function getOr404($id){
+        $service = $this->getService();
+        if(!($employee = $service->get($id))){
+            throw new NotFoundHttpException(sprintf('The resource \'%s\' was not found.',$id));
+        }
+        return $employee;
     }
 }

@@ -5,7 +5,7 @@
     "use strict";
 
     angular.module('ems.common.resources', [
-        'ngResource',
+        'restangular',
         'ems.appProperties'
     ]);
 })();

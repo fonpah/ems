@@ -9,8 +9,12 @@
 namespace Devster\AppBundle\Service;
 
 use Devster\AppBundle\Entity\Employee;
+use Devster\AppBundle\Exception\InvalidFormException;
+use Devster\AppBundle\Form\Type\EmployeeType;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
+use Symfony\Component\Form\FormFactory;
+use Symfony\Component\Form\FormFactoryInterface;
 
 /**
  * Class EmployeeService
@@ -32,12 +36,17 @@ class EmployeeService implements IEmployeeService
      */
     private $repository;
 
+    /**
+     * @var FormFactoryInterface
+     */
+    private $formFactory;
 
-    public function __construct(ObjectManager $om, $entityClassName)
+    public function __construct(ObjectManager $om, $entityClassName, FormFactoryInterface $formFactory)
     {
         $this->om = $om;
         $this->entityClassName = $entityClassName;
         $this->repository = $this->om->getRepository($this->entityClassName);
+        $this->formFactory = $formFactory;
     }
 
     /**
@@ -45,17 +54,18 @@ class EmployeeService implements IEmployeeService
      * @API
      * @param int $page the page
      * @param int $limit the number of item per page
+     * @param array $orderBy
      * @return array
      */
-    public function all($page = 1, $limit = 10)
+    public function all($page = 1, $limit = 10, $orderBy= array('createdAt'=>'DESC'))
     {
-        //TODO: Implement all() Method
+        return $this->repository->findBy(array('isDeleted'=>false),$orderBy, $limit,$page);
     }
 
     /**
      * Get a Given Employee by Id
      * @param int $id
-     * @return Employees
+     * @return Employee
      */
     public function get($id)
     {
@@ -63,14 +73,16 @@ class EmployeeService implements IEmployeeService
     }
 
     /**
-     * Post a new EMployee, Create a new Employee
+     * Post a new Employee, Create a new Employee
      * @API
      * @param array $data
      * @return Employee
      */
     public function post(array $data)
     {
+        // the factory method to create a empty employee instance
         $employee = $this->createEmployee();
+        //process form does all the magic, validate and hydrate the employee  object
         return $this->processForm($employee, $data, 'POST');
     }
 
@@ -100,6 +112,17 @@ class EmployeeService implements IEmployeeService
     }
 
     /**
+     * Delete an employee
+     * @param Employee $employee
+     * @return bool
+     */
+    public function delete(Employee $employee){
+        $employee->setIsDeleted(true);
+        $this->om->persist($employee);
+        $this->om->flush($employee);
+        return true;
+    }
+    /**
      * @param Employee $employee
      * @param array $data
      * @param string $method
@@ -107,7 +130,15 @@ class EmployeeService implements IEmployeeService
      */
     private function processForm(Employee $employee, array $data, $method = 'PUT')
     {
-
+        $form = $this->formFactory->create(new EmployeeType(), $employee, array('method'=> $method));
+        $form->submit($data, 'PATCH'!== $method);
+        if($form->isValid()){
+            $employee = $form->getData();
+            $this->om->persist($employee);
+            $this->om->flush($employee);
+            return $employee;
+        }
+        throw new InvalidFormException('Invalid submitted data!', $form);
     }
 
     /**

@@ -5,23 +5,89 @@
     "use strict";
 
     angular.module('ems.common.resources', [
-        'ngResource',
+        'restangular',
         'ems.appProperties'
     ]);
 })();
 /**
- * Created by fonpah on 20.03.2015.
+ * Created by fonpah on 22.03.2015.
  */
 (function(){
     "use strict";
     angular.module('ems.common.resources')
-        .factory('CompanyProfileResourceFactory', CompanyProfileResourceFactory);
+        .factory('EmployeeResourceFactory', employeeResourceFactory);
 
-    CompanyProfileResourceFactory.$inject = ['$resource', 'RESOURCE_BASE_URL'];
-    function CompanyProfileResourceFactory ($resource, RESOURCE_BASE_URL){
-        return $resource(RESOURCE_BASE_URL,{},{
-            getCompanyProfile: {method:"GET",params:{verb:"company-profile.json"}, isArray:false}
-        });
+    employeeResourceFactory.$inject = ['Restangular', 'RESOURCE_BASE_URL'];
+
+    function employeeResourceFactory (Restangular, RESOURCE_BASE_URL){
+        return {
+            getEmployees:Restangular.all('employees').getList()
+        };
+    }
+})();
+/**
+ * Created by fonpah on 22.03.2015.
+ */
+(function () {
+    "use strict";
+    angular.module('ems.employee', [
+        'ui.router',
+        'ui.bootstrap',
+        'restangular'
+    ])
+        .config([
+            '$stateProvider',
+            '$urlRouterProvider',
+             function ($stateProvider, $urlRouterProvider) {
+                 $urlRouterProvider.when('/employees', '/employees/list');
+                 $urlRouterProvider.when('/employees/', '/employees/list');
+                 $stateProvider
+                     .state('employee',{
+                         name: 'employee',
+                         url: '/employees',
+                         templateUrl:'app/modules/employee/tpl/index.html'
+                     })
+                     .state('employee.list',{
+                         parent:'employee',
+                         url: '/list',
+                         templateUrl:'app/modules/employee/tpl/list.html',
+                         controller: 'EmployeeController'
+                     })
+                     .state('employee.create',{
+                         parent:'employee',
+                         url:'/create',
+                         templateUrl:'app/modules/employee/tpl/create.html',
+                         data:{
+                             title:'Create Employee'
+                         },
+                         controller:'CreateEmployeeController'
+                     });
+            }
+        ]);
+})();
+/**
+ * Created by fonpah on 22.03.2015.
+ */
+(function () {
+    "use strict";
+    angular.module('ems.employee')
+        .controller('CreateEmployeeController', ['$scope', 'Restangular', function ($scope, Restangular) {
+           console.log( Restangular.one('employees/new').get());
+        }
+        ]);
+})();
+/**
+ * Created by fonpah on 22.03.2015.
+ */
+(function () {
+    "use strict";
+    angular.module('ems.employee')
+        .controller('EmployeeController', employeeCtrl);
+
+    employeeCtrl.$inject = ['$scope','Restangular'];
+
+    function employeeCtrl($scope,Restangular) {
+        $scope.employees = Restangular.all('employees').getList();
     }
 })();
 /**
@@ -43,10 +109,11 @@
                         name: 'dashboard',
                         url: '/',
                         resolve: {
-                            companyProfile: ['CompanyProfileResourceFactory', function (CompanyProfileResourceFactory) {
+                            /*companyProfile: ['CompanyProfileResourceFactory', function (CompanyProfileResourceFactory) {
                                 return CompanyProfileResourceFactory.getCompanyProfile().$promise;
-                            }]
+                            }]*/
                         },
+                        templateUrl:'app/modules/dashboard/tpl/index.html',
                         controller: 'DashboardController'
                     });
             }
@@ -56,34 +123,15 @@
 /**
  * Created by fonpah on 20.03.2015.
  */
-(function(){
+(function () {
     "use strict";
     angular.module('ems.dashboard')
         .controller('DashboardController', dashboardController);
-    dashboardController.$inject = ['$scope', 'companyProfile'];
-    function dashboardController($scope, companyProfile){
-        console.log(companyProfile);
+
+    dashboardController.$inject = ['$scope'];
+
+    function dashboardController($scope) {
     }
-})();
-(function () {
-    'use strict';
-
-
-    angular
-        .module('ems', [
-            'ui.router',
-            'ngStorage',
-            'ems.appProperties',
-            'ems.common.resources',
-            'ems.dashboard'
-        ])
-
-        .config(['$logProvider', '$urlRouterProvider', function ($logProvider, $urlRouterProvider) {
-            $logProvider.debugEnabled(true);
-            /* if no routes match... fallback to root (dashboard) */
-            $urlRouterProvider.otherwise('/');
-        }]);
-
 })();
 (function(){
   'use strict';
@@ -115,6 +163,30 @@
    **/
 
     .constant('DUMMY_RESOURCE_BASE_URL', '/dummy/:verb/:id/:specificVerb')
+
+})();
+(function () {
+    'use strict';
+
+
+    angular
+        .module('ems', [
+            'ui.router',
+            'ngStorage',
+            'restangular',
+            'angular-loading-bar',
+            'ems.appProperties',
+            'ems.dashboard',
+            'ems.employee'
+        ])
+
+        .config(['$logProvider', '$urlRouterProvider','RestangularProvider', function ($logProvider, $urlRouterProvider,RestangularProvider) {
+            $logProvider.debugEnabled(true);
+            RestangularProvider.setBaseUrl('/api/v1');
+            RestangularProvider.setDefaultRequestParams({ apiKey: '4f847ad3e4b08a2eed5f3b54' });
+            /* if no routes match... fallback to root (dashboard) */
+            $urlRouterProvider.otherwise('/');
+        }]);
 
 })();
 (function(){

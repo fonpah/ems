@@ -21,7 +21,7 @@
                                 return CompanyProfileResourceFactory.getCompanyProfile().$promise;
                             }]*/
                         },
-                        templateUrl:'app/dashboard/tpl/index.html',
+                        templateUrl:'app/modules/dashboard/tpl/index.html',
                         controller: 'DashboardController'
                     });
             }

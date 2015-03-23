@@ -8,7 +8,32 @@
 
 namespace Devster\AppBundle\Exception;
 
+/**
+ * Class InvalidFormException
+ * @package Devster\AppBundle\Exception
+ */
+class InvalidFormException extends \RuntimeException
+{
+    /**
+     * @var object
+     */
+    protected $form;
 
-class InvalidFormException {
+    /**
+     * @param string $msg
+     * @param null $form
+     */
+    public function __construct($msg, $form = null)
+    {
+        parent::__construct($msg);
+        $this->form = $form;
+    }
 
+    /**
+     * @return null
+     */
+    public function getForm()
+    {
+        return $this->form;
+    }
 }
