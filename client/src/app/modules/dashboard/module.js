@@ -17,10 +17,11 @@
                         name: 'dashboard',
                         url: '/',
                         resolve: {
-                            companyProfile: ['CompanyProfileResourceFactory', function (CompanyProfileResourceFactory) {
+                            /*companyProfile: ['CompanyProfileResourceFactory', function (CompanyProfileResourceFactory) {
                                 return CompanyProfileResourceFactory.getCompanyProfile().$promise;
-                            }]
+                            }]*/
                         },
+                        templateUrl:'app/dashboard/tpl/index.html',
                         controller: 'DashboardController'
                     });
             }
